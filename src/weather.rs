@@ -1,8 +1,26 @@
+//! Weather information retrieval using wttr.in service.
+//!
+//! This module provides an interface to fetch current weather information
+//! for a given location or auto-detected location using the wttr.in API.
+
 use std::process::Command;
 
+/// Controller for fetching weather information.
+///
+/// Uses the wttr.in service to retrieve weather data without requiring API keys.
 pub struct WeatherController;
 
 impl WeatherController {
+    /// Gets current weather information for a location.
+    ///
+    /// # Arguments
+    ///
+    /// * `location` - Optional location string (e.g., "San Francisco" or "London, UK").
+    ///                If None, the location is auto-detected based on IP address.
+    ///
+    /// # Returns
+    ///
+    /// Returns a formatted weather string including location, conditions, and temperature.
     pub fn get_weather(location: Option<&str>) -> Result<String, String> {
         // Use wttr.in service which provides weather info without API keys
         let url = if let Some(loc) = location {

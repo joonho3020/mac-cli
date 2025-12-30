@@ -2,6 +2,14 @@
 name = "mac-cli"
 version = "0.1.0"
 edition = "2024"
+description = "A simple CLI tool to control your Mac (volume, brightness, Bluetooth, Apple Music, weather)"
+license = "Apache-2.0"
+repository = "https://github.com/joonho3020/mac-cli"
+homepage = "https://github.com/joonho3020/mac-cli"
+documentation = "https://docs.rs/mac-cli"
+readme = "README.md"
+keywords = ["macos", "cli", "brightness", "volume", "bluetooth"]
+categories = ["command-line-utilities"]
 
 [[bin]]
 name = "mac"

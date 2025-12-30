@@ -1,5 +1,13 @@
+//! Bluetooth device listing for macOS using system_profiler.
+//!
+//! This module provides an interface to list Bluetooth devices on macOS
+//! by querying system_profiler.
+
 use std::process::Command;
 
+/// Controller for Bluetooth device information on macOS.
+///
+/// Uses system_profiler to retrieve information about paired and connected Bluetooth devices.
 pub struct BluetoothController;
 
 impl BluetoothController {
@@ -21,6 +29,11 @@ impl BluetoothController {
         Ok(String::from_utf8_lossy(&output.stdout).to_string())
     }
 
+    /// Lists Bluetooth devices in a simple, parsed format.
+    ///
+    /// # Returns
+    ///
+    /// Returns a vector of Bluetooth device names.
     pub fn list_devices_simple() -> Result<Vec<String>, String> {
         // Simple approach: parse the output to get device names
         let output = Command::new("system_profiler")

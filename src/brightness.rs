@@ -1,3 +1,8 @@
+//! Brightness control for macOS displays using the DisplayServices framework.
+//!
+//! This module provides an interface to get and set screen brightness on macOS
+//! by accessing the private DisplayServices framework.
+
 use core_graphics::display::{CGDirectDisplayID, CGGetActiveDisplayList};
 use std::ffi::CString;
 use std::os::raw::{c_char, c_float, c_int, c_void};
@@ -17,6 +22,9 @@ type DisplayServicesGetBrightnessFn =
 type DisplayServicesSetBrightnessFn =
     unsafe extern "C" fn(display: CGDirectDisplayID, brightness: c_float) -> c_int;
 
+/// Controller for managing display brightness on macOS.
+///
+/// Uses the DisplayServices framework to control the brightness of the primary display.
 pub struct BrightnessController {
     display_id: CGDirectDisplayID,
     handle: *mut c_void,
@@ -25,6 +33,12 @@ pub struct BrightnessController {
 }
 
 impl BrightnessController {
+    /// Creates a new brightness controller for the primary display.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if no active displays are found or if the DisplayServices
+    /// framework functions are not available.
     pub fn new() -> Result<Self, String> {
         let mut display_count: u32 = 0;
         let mut displays: [CGDirectDisplayID; 16] = [0; 16];
@@ -88,6 +102,11 @@ impl BrightnessController {
         }
     }
 
+    /// Gets the current brightness level.
+    ///
+    /// # Returns
+    ///
+    /// Returns a value between 0.0 (minimum) and 1.0 (maximum).
     pub fn get(&self) -> Result<f32, String> {
         let mut brightness: c_float = 0.0;
 
@@ -101,6 +120,15 @@ impl BrightnessController {
         Ok(brightness)
     }
 
+    /// Sets the brightness level.
+    ///
+    /// # Arguments
+    ///
+    /// * `brightness` - A value between 0.0 (minimum) and 1.0 (maximum).
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the brightness value is out of range or if setting fails.
     pub fn set(&self, brightness: f32) -> Result<(), String> {
         if !(0.0..=1.0).contains(&brightness) {
             return Err("Brightness must be between 0.0 and 1.0".to_string());

@@ -1,5 +1,13 @@
+//! Apple Music control for macOS using AppleScript.
+//!
+//! This module provides an interface to control Apple Music playback,
+//! including play/pause, track navigation, and playlist management.
+
 use std::process::Command;
 
+/// Controller for Apple Music on macOS.
+///
+/// Uses AppleScript to control Apple Music playback and playlist management.
 pub struct MusicController;
 
 impl MusicController {
@@ -20,26 +28,36 @@ impl MusicController {
         Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
     }
 
+    /// Plays the current track in Apple Music.
     pub fn play() -> Result<(), String> {
         Self::run_script("tell application \"Music\" to play")?;
         Ok(())
     }
 
+    /// Pauses the current playback in Apple Music.
     pub fn pause() -> Result<(), String> {
         Self::run_script("tell application \"Music\" to pause")?;
         Ok(())
     }
 
+    /// Skips to the next track in Apple Music.
     pub fn next() -> Result<(), String> {
         Self::run_script("tell application \"Music\" to next track")?;
         Ok(())
     }
 
+    /// Goes to the previous track in Apple Music.
     pub fn previous() -> Result<(), String> {
         Self::run_script("tell application \"Music\" to previous track")?;
         Ok(())
     }
 
+    /// Gets information about the currently playing track.
+    ///
+    /// # Returns
+    ///
+    /// Returns a string in the format "Track Name - Artist Name" if playing,
+    /// or "Not playing" if nothing is currently playing.
     pub fn current() -> Result<String, String> {
         let script = r#"
             tell application "Music"
@@ -62,6 +80,11 @@ impl MusicController {
         Ok(state == "playing")
     }
 
+    /// Lists all available playlists in Apple Music.
+    ///
+    /// # Returns
+    ///
+    /// Returns a vector of playlist names.
     pub fn list_playlists() -> Result<Vec<String>, String> {
         let script = r#"
             tell application "Music"
@@ -82,12 +105,26 @@ impl MusicController {
         Ok(playlists)
     }
 
+    /// Plays a specific playlist by name.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the playlist to play.
     pub fn play_playlist(name: &str) -> Result<(), String> {
         let script = format!(r#"tell application "Music" to play playlist named "{}""#, name);
         Self::run_script(&script)?;
         Ok(())
     }
 
+    /// Displays an interactive playlist picker using fzf and plays the selected playlist.
+    ///
+    /// # Returns
+    ///
+    /// Returns the name of the selected playlist.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if fzf is not installed or if no playlist is selected.
     pub fn play_playlist_interactive() -> Result<String, String> {
         use std::io::Write;
 

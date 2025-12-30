@@ -1,3 +1,16 @@
+//! # mac-cli
+//!
+//! A command-line tool for controlling macOS system features including brightness,
+//! volume, Apple Music, Bluetooth, and weather information.
+//!
+//! ## Features
+//!
+//! - **Brightness**: Get and set screen brightness (10-100%)
+//! - **Volume**: Control system volume (0-100%)
+//! - **Apple Music**: Play/pause, skip tracks, manage playlists
+//! - **Bluetooth**: List paired and connected devices
+//! - **Weather**: Get current weather for any location
+
 mod brightness;
 mod bluetooth;
 mod music;

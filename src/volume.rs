@@ -1,8 +1,17 @@
+//! Volume control for macOS using AppleScript.
+//!
+//! This module provides an interface to get and set system volume on macOS
+//! by executing AppleScript commands.
+
 use std::process::Command;
 
+/// Controller for managing system volume on macOS.
+///
+/// Uses AppleScript to control the system volume output.
 pub struct VolumeController;
 
 impl VolumeController {
+    /// Creates a new volume controller.
     pub fn new() -> Result<Self, String> {
         Ok(VolumeController)
     }
@@ -24,6 +33,11 @@ impl VolumeController {
         Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
     }
 
+    /// Gets the current volume level.
+    ///
+    /// # Returns
+    ///
+    /// Returns a value between 0.0 (mute) and 1.0 (maximum).
     pub fn get(&self) -> Result<f32, String> {
         let script = "output volume of (get volume settings)";
         let result = Self::run_script(script)?;
@@ -36,6 +50,15 @@ impl VolumeController {
         Ok(volume / 100.0)
     }
 
+    /// Sets the volume level.
+    ///
+    /// # Arguments
+    ///
+    /// * `volume` - A value between 0.0 (mute) and 1.0 (maximum).
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the volume value is out of range or if the AppleScript fails.
     pub fn set(&self, volume: f32) -> Result<(), String> {
         if !(0.0..=1.0).contains(&volume) {
             return Err("Volume must be between 0.0 and 1.0".to_string());

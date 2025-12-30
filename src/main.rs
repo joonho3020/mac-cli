@@ -2,17 +2,19 @@ mod brightness;
 mod bluetooth;
 mod music;
 mod volume;
+mod weather;
 
 use brightness::BrightnessController;
 use bluetooth::BluetoothController;
 use clap::{Parser, Subcommand};
 use music::MusicController;
 use volume::VolumeController;
+use weather::WeatherController;
 
-/// macOS system control utility - control brightness, volume, music, and Bluetooth
+/// macOS system control utility - control brightness, volume, music, Bluetooth, and weather
 #[derive(Parser, Debug)]
 #[command(name = "mac-control")]
-#[command(about = "Control macOS system features", long_about = None)]
+#[command(about = "Control macOS system features and get weather info", long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -38,6 +40,12 @@ enum Commands {
 
     /// List Bluetooth devices
     Bluetooth,
+
+    /// Get current weather
+    Weather {
+        /// Location (city, country). If not provided, auto-detects location
+        location: Option<String>,
+    },
 }
 
 #[derive(Subcommand, Debug)]
@@ -71,6 +79,7 @@ fn main() {
         Commands::Volume { percentage } => handle_volume(percentage),
         Commands::Music(music_cmd) => handle_music(music_cmd),
         Commands::Bluetooth => handle_bluetooth(),
+        Commands::Weather { location } => handle_weather(location),
     };
 
     if let Err(e) = result {
@@ -203,6 +212,14 @@ fn handle_bluetooth() -> Result<(), String> {
             println!("  - {}", device);
         }
     }
+
+    Ok(())
+}
+
+fn handle_weather(location: Option<String>) -> Result<(), String> {
+    let location_ref = location.as_deref();
+    let weather = WeatherController::get_weather(location_ref)?;
+    println!("{}", weather);
 
     Ok(())
 }

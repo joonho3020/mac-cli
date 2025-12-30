@@ -13,7 +13,7 @@ use weather::WeatherController;
 
 /// macOS system control utility - control brightness, volume, music, Bluetooth, and weather
 #[derive(Parser, Debug)]
-#[command(name = "mac-control")]
+#[command(name = "mac")]
 #[command(about = "Control macOS system features and get weather info", long_about = None)]
 struct Cli {
     #[command(subcommand)]

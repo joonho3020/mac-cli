@@ -52,6 +52,15 @@ enum MusicCommands {
     Previous,
     /// Show current track
     Current,
+    /// List or play playlists
+    Playlists {
+        /// Playlist name to play directly
+        name: Option<String>,
+
+        /// Just list playlists without playing
+        #[arg(short, long)]
+        list: bool,
+    },
 }
 
 fn main() {
@@ -134,6 +143,49 @@ fn handle_music(cmd: MusicCommands) -> Result<(), String> {
         MusicCommands::Current => {
             let info = MusicController::current()?;
             println!("{}", info);
+        }
+        MusicCommands::Playlists { name, list } => {
+            if list {
+                // Just list playlists
+                let playlists = MusicController::list_playlists()?;
+                if playlists.is_empty() {
+                    println!("No playlists found");
+                } else {
+                    println!("Playlists:");
+                    for playlist in playlists {
+                        println!("  - {}", playlist);
+                    }
+                }
+            } else {
+                match name {
+                    Some(playlist_name) => {
+                        // Play specific playlist
+                        MusicController::play_playlist(&playlist_name)?;
+                        println!("Playing playlist: {}", playlist_name);
+
+                        // Show current track after a brief moment
+                        std::thread::sleep(std::time::Duration::from_millis(500));
+                        match MusicController::current() {
+                            Ok(info) => println!("Now playing: {}", info),
+                            Err(_) => {} // Ignore error if track info not available
+                        }
+                    }
+                    None => {
+                        // Interactive mode with fzf
+                        match MusicController::play_playlist_interactive() {
+                            Ok(selected) => {
+                                println!("Playing playlist: {}", selected);
+                                std::thread::sleep(std::time::Duration::from_millis(500));
+                                match MusicController::current() {
+                                    Ok(info) => println!("Now playing: {}", info),
+                                    Err(_) => {}
+                                }
+                            }
+                            Err(e) => return Err(e),
+                        }
+                    }
+                }
+            }
         }
     }
 

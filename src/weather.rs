@@ -20,14 +20,15 @@ impl WeatherController {
     ///
     /// # Returns
     ///
-    /// Returns a formatted weather string including location, conditions, and temperature.
+    /// Returns a formatted weather string including location, conditions, and temperature in Celsius.
     pub fn get_weather(location: Option<&str>) -> Result<String, String> {
         // Use wttr.in service which provides weather info without API keys
+        // The 'm' parameter ensures metric units (Celsius)
         let url = if let Some(loc) = location {
-            format!("https://wttr.in/{}?format=3", loc.replace(' ', "+"))
+            format!("https://wttr.in/{}?format=3&m", loc.replace(' ', "+"))
         } else {
             // Auto-detect location
-            "https://wttr.in/?format=3".to_string()
+            "https://wttr.in/?format=3&m".to_string()
         };
 
         // Use curl to fetch weather data
